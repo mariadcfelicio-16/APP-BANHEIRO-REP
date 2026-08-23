@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#7137d8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Banheiro Apto 101</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="author-credit">Maria Daniela Camilo Felício</div>
+
+  <section id="landing" class="screen landing-screen">
+    <div class="landing-card">
+      <img class="landing-image" src="assets/capa-v4.png" alt="Banheiro Apto 101">
+      <div class="landing-actions">
+        <button class="btn primary wide" onclick="openAuth('login')">Entrar</button>
+        <button class="btn outline wide" onclick="openAuth('signup')">Criar conta</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="auth" class="screen auth-screen hidden">
+    <div class="auth-card">
+      <button class="back" onclick="backToLanding()">‹</button>
+      <div class="auth-head">
+        <div class="logo">🏠💜</div>
+        <h1 id="authTitle">Bem-vinda de volta!</h1>
+        <p id="authSubtitle">Faça login para continuar</p>
+      </div>
+      <div id="authError" class="error hidden"></div>
+
+      <form id="loginForm" onsubmit="event.preventDefault();signIn();">
+        <label>E-mail</label>
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="seu@email.com" required>
+        <label>Senha</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+        <label class="remember"><input id="rememberUser" type="checkbox" checked> Lembrar meu acesso</label>
+        <button class="btn primary wide" type="submit">Entrar</button>
+        <p class="switch">Ainda não tem conta? <button type="button" onclick="openAuth('signup')">Criar conta</button></p>
+      </form>
+
+      <form id="signupForm" class="hidden" onsubmit="event.preventDefault();signUp();">
+        <label>Nome / usuário</label>
+        <input id="signupName" type="text" placeholder="Seu nome" required>
+        <label>E-mail</label>
+        <input id="signupEmail" type="email" autocomplete="email" placeholder="seu@email.com" required>
+        <label>Senha</label>
+        <input id="signupPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required>
+        <label>Quarto</label>
+        <select id="signupRoom">
+          <option>Quarto 5</option><option>Quarto 6</option><option>Quarto 7</option><option>Quarto 8</option><option>Quarto 9</option>
+        </select>
+        <button class="btn primary wide" type="submit">Criar conta</button>
+        <p class="switch">Já tem conta? <button type="button" onclick="openAuth('login')">Entrar</button></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="app" class="app hidden">
+    <header class="app-header">
+      <div><h1>Banheiro Apto 101 ✦</h1><small id="who"></small></div>
+      <button class="logout" onclick="logout()">Sair</button>
+    </header>
+
+    <main class="main">
+      <section id="dash"></section>
+      <section id="agenda" class="hidden"></section>
+      <section id="trash" class="hidden"></section>
+      <section id="rank" class="hidden"></section>
+      <section id="profile" class="hidden"></section>
+      <section id="history" class="hidden"></section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button id="navDash" class="active" onclick="showTab('dash')">⌂<small>Painel</small></button>
+      <button id="navAgenda" onclick="showTab('agenda')">🧹<small>Limpeza</small></button>
+      <button id="navTrash" onclick="showTab('trash')">🗑️<small>Lixo</small></button>
+      <button id="navRank" onclick="showTab('rank')">🏆<small>Ranking</small></button>
+      <button id="navProfile" onclick="showTab('profile')">👤<small>Perfil</small></button>
+    </nav>
+
+    <button class="fab" onclick="openQuickTrash()">🗑️<small>+</small></button>
+  </section>
+
+  <div id="quickTrashModal" class="modal-bg hidden">
+    <div class="modal">
+      <h2>🗑️ Registrar lixo</h2>
+      <p id="quickTrashText"></p>
+      <div class="actions">
+        <button class="btn green" onclick="confirmQuickTrash()">Confirmar</button>
+        <button class="btn light" onclick="closeQuickTrash()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
