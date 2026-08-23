@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#128C7E">
+<link rel="manifest" href="manifest.json">
+<title>Agenda da República</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f4;color:#17202a;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(145deg,#075E54,#128C7E)}
+.box{background:#fff;width:min(440px,100%);padding:26px;border-radius:24px;box-shadow:0 15px 50px #0004}
+h1{margin:0 0 7px}h2{margin:10px 0}.muted{color:#68737d;font-size:13px}
+.field{margin:12px 0}label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}
+input,select{width:100%;padding:12px;border:1px solid #d8dddf;border-radius:12px;background:#fff}
+.primary{background:#128C7E;color:#fff;padding:12px 15px;border-radius:12px;font-weight:800;width:100%}
+.secondary{background:#e8eeee;padding:11px 13px;border-radius:11px;font-weight:800}
+.error{background:#ffe0dc;color:#8d2b21;padding:10px;border-radius:10px;font-size:13px;margin:8px 0}
+.app{display:none}header{background:#128C7E;color:#fff;padding:16px;position:sticky;top:0;z-index:10}
+.head{max-width:900px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+header h1{font-size:20px;margin:0}header small{opacity:.9}.logout{background:#ffffff22;color:#fff;padding:8px 10px;border-radius:10px}
+main{max-width:900px;margin:auto;padding:14px}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:13px}
+.tabs button{background:#fff;border:1px solid #ddd;padding:10px 13px;border-radius:12px;font-weight:800;white-space:nowrap}.tabs .on{background:#128C7E;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat,.card{background:#fff;border-radius:17px;padding:15px;box-shadow:0 2px 10px #0000000c;margin:9px 0}
+.stat b{display:block;font-size:22px}.stat span{font-size:11px;color:#68737d}
+.next{background:#17202a;color:#fff;border-radius:18px;padding:18px;margin:12px 0}.next .big{font-size:25px;font-weight:900;margin:5px 0}
+.next button{background:#25D366;color:#063b1c;padding:10px 13px;border-radius:11px;font-weight:900;margin-top:10px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.badge{font-size:10px;font-weight:900;padding:6px 8px;border-radius:20px;background:#fff1c7}
+.ok{background:#d9f5e3;color:#176b3b}.late{background:#ffe0dc;color:#a93226}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.actions button{padding:10px 12px;border-radius:11px;font-weight:800}
+.done{background:#128C7E;color:#fff}.danger{background:#ffe0dc;color:#a93226}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.day{min-height:62px;background:#fff;border:1px solid #e2e6e8;border-radius:10px;padding:7px;font-size:10px}
+.day b{display:block;font-size:15px}.day.marked{background:#d9f5e3;border-color:#8fd1a8}
+.calhead{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:8px 0 5px;font-size:10px;font-weight:900;text-align:center;color:#68737d}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:9px 6px;border-bottom:1px solid #edf0f1;text-align:left}
+.hidden{display:none!important}.notice{padding:10px;border-radius:11px;background:#eef8f5;color:#176b3b;font-size:13px}
+@media(max-width:650px){.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="login" class="login"><div class="box">
+<h1>🧽🗑️ Agenda da República</h1>
+<p class="muted">Limpeza do banheiro + calendário do lixo</p>
+<div id="err" class="error hidden"></div>
+<div class="field"><label>NOME</label><input id="name" placeholder="Seu nome"></div>
+<div class="field"><label>E-MAIL</label><input id="email" type="email" placeholder="seu@email.com"></div>
+<div class="field"><label>SENHA</label><input id="password" type="password" placeholder="Mínimo 6 caracteres"></div>
+<div class="field"><label>QUARTO</label><select id="room">
+<option>Quarto 5</option><option>Quarto 6</option><option>Quarto 7</option><option>Quarto 8</option><option>Quarto 9</option>
+</select></div>
+<button class="primary" onclick="enter(true)">Criar conta</button>
+<button class="secondary" style="width:100%;margin-top:8px" onclick="enter(false)">Já tenho conta</button>
+<p class="muted">Os registros ficam compartilhados online entre os moradores.</p>
+</div></div>
+
+<div id="app" class="app">
+<header><div class="head"><div><h1>🧽🗑️ Agenda da República</h1><small id="who"></small></div><button class="logout" onclick="logout()">Sair</button></div></header>
+<main>
+<div class="tabs">
+<button id="td" class="on" onclick="tab('dash')">📊 Painel</button>
+<button id="ta" onclick="tab('agenda')">🧽 Limpeza</button>
+<button id="tl" onclick="tab('lixo')">🗑️ Lixo</button>
+<button id="tr" onclick="tab('rank')">🏆 Ranking</button>
+<button id="th" onclick="tab('hist')">📜 Histórico</button>
+</div>
+<section id="dash"></section>
+<section id="agenda" class="hidden"></section>
+<section id="lixo" class="hidden"></section>
+<section id="rank" class="hidden"></section>
+<section id="hist" class="hidden"></section>
+</main></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL="https://xdswybtzbmtxzxcnytqn.supabase.co";
+const SB_KEY="sb_publishable_2Q8BxVITxZri3doBrLep3Q_tKT_JsVG";
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const rooms=["Quarto 5","Quarto 6","Quarto 7","Quarto 8","Quarto 9"];
+const schedule=[{"date": "2026-08-01", "room": "Quarto 9"}, {"date": "2026-08-08", "room": "Quarto 5"}, {"date": "2026-08-15", "room": "Quarto 6"}, {"date": "2026-08-22", "room": "Quarto 7"}, {"date": "2026-08-29", "room": "Quarto 8"}, {"date": "2026-09-05", "room": "Quarto 9"}, {"date": "2026-09-12", "room": "Quarto 5"}, {"date": "2026-09-19", "room": "Quarto 6"}, {"date": "2026-09-26", "room": "Quarto 7"}, {"date": "2026-10-03", "room": "Quarto 8"}, {"date": "2026-10-10", "room": "Quarto 9"}, {"date": "2026-10-17", "room": "Quarto 5"}, {"date": "2026-10-24", "room": "Quarto 6"}, {"date": "2026-10-31", "room": "Quarto 7"}, {"date": "2026-11-07", "room": "Quarto 8"}, {"date": "2026-11-14", "room": "Quarto 9"}, {"date": "2026-11-21", "room": "Quarto 5"}, {"date": "2026-11-28", "room": "Quarto 6"}, {"date": "2026-12-05", "room": "Quarto 7"}, {"date": "2026-12-12", "room": "Quarto 8"}, {"date": "2026-12-19", "room": "Quarto 9"}, {"date": "2026-12-26", "room": "Quarto 5"}];
+let me=null,clean=[],trash=[],profiles=[],month=new Date().getMonth(),year=new Date().getFullYear();
+
+function showError(e){const x=document.getElementById('err');x.textContent=e.message||String(e);x.classList.remove('hidden')}
+async function enter(signup){
+ document.getElementById('err').classList.add('hidden');
+ const name=document.getElementById('name').value.trim(),email=document.getElementById('email').value.trim(),password=document.getElementById('password').value,room=document.getElementById('room').value;
+ try{
+  if(!email||!password)throw new Error("Informe e-mail e senha.");
+  let r;
+  if(signup){
+   r=await sb.auth.signUp({email,password,data:{name,room}});
+   if(r.error)throw r.error;
+   if(!r.data.session)throw new Error("Conta criada. Confirme seu e-mail, se solicitado, e depois entre.");
+  }else{
+   r=await sb.auth.signInWithPassword({email,password});if(r.error)throw r.error;
+  }
+  await load();
+ }catch(e){showError(e)}
+}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function load(){
+ const {data:u}=await sb.auth.getUser();if(!u.user)return;
+ let p=await sb.from('profiles').select('*').eq('id',u.user.id).maybeSingle();
+ if(!p.data){
+  const q=await sb.from('profiles').insert({id:u.user.id,name:u.user.user_metadata?.name||u.user.email,room:u.user.user_metadata?.room||'Quarto 5'});
+  if(q.error)throw q.error;
+  p=await sb.from('profiles').select('*').eq('id',u.user.id).single();
+ }
+ me={...p.data,id:u.user.id};
+ document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';
+ document.getElementById('who').textContent=me.name+" • "+me.room;
+ await refresh();
+}
+async function refresh(){
+ const a=await sb.from('cleaning_records').select('*').order('cleaning_date');
+ const b=await sb.from('trash_records').select('*').order('trash_date',{ascending:false});
+ const c=await sb.from('profiles').select('*');
+ clean=a.data||[];trash=b.data||[];profiles=c.data||[];
+ renderAll();
+}
+function tab(t){['dash','agenda','lixo','rank','hist'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==t));[['td','dash'],['ta','agenda'],['tl','lixo'],['tr','rank'],['th','hist']].forEach(([b,x])=>document.getElementById(b).classList.toggle('on',x===t))}
+function recFor(d){return clean.find(x=>x.cleaning_date===d)}
+function profileName(id){return profiles.find(p=>p.id===id)?.name||'Morador'}
+function profileRoom(id){return profiles.find(p=>p.id===id)?.room||''}
+function next(){const now=new Date().toISOString().slice(0,10);return schedule.find(x=>!recFor(x.date)&&x.date>=now)||schedule.find(x=>!recFor(x.date))}
+async function markClean(d,status){
+ const s=schedule.find(x=>x.date===d);if(!s)return;
+ const q=await sb.from('cleaning_records').insert({cleaning_date:d,assigned_room:s.room,status,recorded_by:me.id});
+ if(q.error)alert(q.error.message);else await refresh();
+}
+async function markTrash(d){
+ const q=await sb.from('trash_records').insert({trash_date:d,recorded_by:me.id});
+ if(q.error)alert(q.error.message);else await refresh();
+}
+async function delTrash(id){
+ const q=await sb.from('trash_records').delete().eq('id',id);
+ if(q.error)alert(q.error.message);else await refresh();
+}
+function br(d){return new Date(d+'T12:00:00').toLocaleDateString('pt-BR')}
+function scoreRoom(room){
+ const c=clean.filter(x=>x.assigned_room===room);
+ return c.reduce((a,x)=>a+(x.status==='done'?10:5),0);
+}
+function renderDash(){
+ const done=clean.filter(x=>x.status==='done').length,late=clean.filter(x=>x.status==='late').length,n=next();
+ const myTrash=trash.filter(x=>x.recorded_by===me.id).length;
+ document.getElementById('dash').innerHTML=
+ `<div class="grid">
+ <div class="stat"><b>${done}</b><span>limpezas feitas</span></div>
+ <div class="stat"><b>${late}</b><span>atrasos</span></div>
+ <div class="stat"><b>${schedule.length-done-late}</b><span>pendentes</span></div>
+ <div class="stat"><b>${scoreRoom(me.room)}</b><span>pontos do seu quarto</span></div>
+ </div>
+ <div class="next"><div>🔔 PRÓXIMA LIMPEZA</div>${n?`<div class="big">${n.room}</div><div>📅 Sábado, ${br(n.date)}</div>`:'<div class="big">Tudo concluído!</div>'}</div>
+ <div class="card"><h3>🗑️ Lixo</h3><p class="muted">Você registrou <b>${myTrash}</b> retirada(s) de lixo.</p><button class="primary" style="width:auto" onclick="tab('lixo')">Abrir calendário</button></div>`;
+}
+function renderAgenda(){
+ let h='<h2>🧽 Agenda de limpeza</h2><div class="notice">Rodízio: Quarto 9 → 5 → 6 → 7 → 8, iniciando em 01/08/2026.</div>';
+ schedule.forEach(x=>{
+  const r=recFor(x.date);
+  h+=`<div class="card"><div class="row"><div><b>${x.room}</b><div class="muted">Sábado • ${br(x.date)}</div></div>
+  <span class="badge ${r?.status==='done'?'ok':r?.status==='late'?'late':''}">${r?.status==='done'?'✓ FEITO':r?.status==='late'?'⚠ ATRASADO':'PENDENTE'}</span></div>
+  ${!r?`<div class="actions"><button class="done" onclick="markClean('${x.date}','done')">✓ Marcar feito</button><button class="danger" onclick="markClean('${x.date}','late')">⚠ Registrar atraso</button></div>`:
+  `<p class="muted">Registrado por ${profileName(r.recorded_by)} em ${new Date(r.recorded_at).toLocaleString('pt-BR')}</p>`}</div>`;
+ });
+ document.getElementById('agenda').innerHTML=h;
+}
+function renderLixo(){
+ const first=new Date(year,month,1),last=new Date(year,month+1,0),start=(first.getDay()+6)%7;
+ let h=`<div class="row"><h2>🗑️ Calendário do lixo</h2><div><button class="secondary" onclick="chg(-1)">‹</button> <button class="secondary" onclick="chg(1)">›</button></div></div>
+ <div class="card"><b>${first.toLocaleString('pt-BR',{month:'long',year:'numeric'})}</b>
+ <div class="calhead"><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span></div><div class="calendar">`;
+ for(let i=0;i<start;i++)h+='<div></div>';
+ for(let d=1;d<=last.getDate();d++){
+  const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const rs=trash.filter(x=>x.trash_date===ds);
+  h+=`<div class="day ${rs.length?'marked':''}"><b>${d}</b>
+  ${rs.length?rs.map(x=>'✓ '+profileName(x.recorded_by)).join('<br>'):'+'}
+  <br><button onclick="markTrash('${ds}')" style="background:transparent;padding:0;font-size:10px">registrar</button></div>`;
+ }
+ h+=`</div><p class="muted">Toque em “registrar” no dia em que você tirou o lixo.</p></div>
+ <div class="card"><h3>Últimos registros</h3>`;
+ trash.slice(0,30).forEach(x=>h+=`<div class="row" style="padding:8px 0;border-bottom:1px solid #eee">
+ <span>🗑️ ${br(x.trash_date)} — <b>${profileName(x.recorded_by)}</b> ${profileRoom(x.recorded_by)?'('+profileRoom(x.recorded_by)+')':''}</span>
+ ${x.recorded_by===me.id?`<button class="secondary" onclick="delTrash(${x.id})">✕</button>`:''}</div>`);
+ h+='</div>';
+ document.getElementById('lixo').innerHTML=h;
+}
+function chg(n){month+=n;if(month<0){month=11;year--}if(month>11){month=0;year++}renderLixo()}
+function renderRank(){
+ let h='<h2>🏆 Ranking por quarto</h2><div class="card"><table><tr><th>Quarto</th><th>Feitas</th><th>Atrasos</th><th>Lixo</th><th>Pontos</th></tr>';
+ rooms.forEach(r=>{
+  const c=clean.filter(x=>x.assigned_room===r);
+  const memberIds=profiles.filter(p=>p.room===r).map(p=>p.id);
+  const t=trash.filter(x=>memberIds.includes(x.recorded_by));
+  h+=`<tr><td><b>${r}</b></td><td>${c.filter(x=>x.status==='done').length}</td><td>${c.filter(x=>x.status==='late').length}</td><td>${t.length}</td><td><b>${scoreRoom(r)}</b></td></tr>`;
+ });
+ h+='</table></div><div class="card"><h3>🗑️ Quem mais tirou o lixo</h3>';
+ const counts={};
+ trash.forEach(x=>counts[x.recorded_by]=(counts[x.recorded_by]||0)+1);
+ Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([id,n])=>h+=`<div class="row" style="padding:7px 0;border-bottom:1px solid #eee"><span>${profileName(id)}</span><b>${n}</b></div>`);
+ h+='</div>';
+ document.getElementById('rank').innerHTML=h;
+}
+function renderHist(){
+ let items=[];
+ clean.forEach(x=>items.push({type:'clean',date:x.recorded_at,html:`🧽 ${br(x.cleaning_date)} — <b>${x.assigned_room}</b> — ${x.status==='done'?'feito':'atrasado'} — ${profileName(x.recorded_by)}`}));
+ trash.forEach(x=>items.push({type:'trash',date:x.recorded_at,html:`🗑️ ${br(x.trash_date)} — <b>${profileName(x.recorded_by)}</b> tirou o lixo`}));
+ items.sort((a,b)=>new Date(b.date)-new Date(a.date));
+ document.getElementById('hist').innerHTML='<h2>📜 Histórico</h2>'+items.slice(0,100).map(x=>`<div class="card">${x.html}</div>`).join('');
+}
+function renderAll(){renderDash();renderAgenda();renderLixo();renderRank();renderHist()}
+sb.auth.getSession().then(x=>{if(x.data.session)load()});
+</script>
+</body></html>
