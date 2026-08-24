@@ -1,0 +1,18 @@
+{
+  "name": "Banheiro Apto 101",
+  "short_name": "Banheiro 101",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6fb",
+  "theme_color": "#7137d8",
+  "lang": "pt-BR",
+  "shortcuts": [
+    {
+      "name": "Registrar lixo",
+      "short_name": "Lixo agora",
+      "description": "Registrar rapidamente que você tirou o lixo",
+      "url": "./?quick=trash"
+    }
+  ]
+}
