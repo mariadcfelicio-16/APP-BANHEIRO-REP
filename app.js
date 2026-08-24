@@ -86,13 +86,26 @@ let profileView = "appearance";
 // ============================================================================
 
 const skinColors = {
+  // Tons claros
   porcelain: "#f9ddcf",
   light: "#f6d0b1",
   medium_light: "#dfa67f",
+
+  // Tons médios
   medium: "#bd7f58",
+  caramel: "#a96f4f",
+  bronze: "#996044",
   medium_dark: "#8c593d",
+
+  // Tons negros
+  brown_dark: "#7a4a34",
+  cocoa: "#6a402f",
   dark: "#5d3928",
+  espresso: "#4c2f22",
+  ebony: "#42291f",
   deep: "#39241c",
+  deep_dark: "#2d1b16",
+  very_deep: "#241511"
 };
 
 const hairColors = {
@@ -148,12 +161,32 @@ const accessoryNames = {
   none: "Sem acessório",
   round_glasses: "Óculos redondo",
   cat_glasses: "Óculos gatinho",
+  sunglasses: "Óculos de sol",
+  heart_glasses: "Óculos coração",
+  star_glasses: "Óculos estrela",
   hoops: "Argolas",
   pearl_earrings: "Pérolas",
+  stud_earrings: "Brincos de ponto",
+  heart_earrings: "Brincos de coração",
+  nose_ring: "Piercing no nariz",
   choker: "Choker",
   necklace: "Colar",
+  heart_necklace: "Colar de coração",
   hair_clip: "Presilha",
   bow: "Laço",
+  flower: "Flor no cabelo",
+  headband: "Tiara/faixa",
+};
+
+const hatNames = {
+  none: "Sem chapéu",
+  cap: "Boné",
+  bucket: "Bucket hat",
+  beanie: "Gorro",
+  cowboy: "Chapéu country",
+  witch: "Chapéu de bruxa",
+  crown: "Coroa",
+  graduation: "Capelo de formatura",
 };
 
 const shirtNames = {
@@ -178,6 +211,7 @@ const shirtNames = {
   flamengo: "Flamengo",
   brasil: "Brasil",
   ufmg: "UFMG",
+  dani: "Dani",
 };
 
 // ============================================================================
@@ -672,6 +706,7 @@ function shirtColor(type) {
     flamengo: "#d71920",
     brasil: "#f7d117",
     ufmg: "#ffffff",
+    dani: "#f7d6e8",
   };
 
   return colors[type] || "#ffffff";
@@ -769,6 +804,19 @@ function shirtPattern(type) {
     `;
   }
 
+  // ------------------------------------------------------------------------
+  // DANI — camiseta personalizada
+  // ------------------------------------------------------------------------
+  if (type === "dani") {
+    return `
+      <g>
+        <path d="M62 170 Q90 181 118 170" fill="none" stroke="#d84f96" stroke-width="3.2"/>
+        <text x="90" y="196" text-anchor="middle" font-size="18" font-family="Arial, sans-serif" font-weight="900" font-style="italic" fill="#8d2d68">Dani</text>
+        <path d="M90 204 C86 198 77 201 77 208 C77 214 84 218 90 220 C96 218 103 214 103 208 C103 201 94 198 90 204Z" fill="#e85d9f" opacity=".9"/>
+      </g>
+    `;
+  }
+
   return "";
 }
 
@@ -777,15 +825,37 @@ function accessory(type) {
     none: "",
     round_glasses: `<g fill="none" stroke="#a96950" stroke-width="2.8"><circle cx="69" cy="102" r="24"/><circle cx="111" cy="102" r="24"/><path d="M93 99 Q90 96 87 99"/></g>`,
     cat_glasses: `<g fill="none" stroke="#6f35d4" stroke-width="3"><path d="M43 91 L48 78 L91 87 L89 112 Q60 124 47 108Z"/><path d="M137 91 L132 78 L89 87 L91 112 Q120 124 133 108Z"/></g>`,
+    sunglasses: `<g><path d="M43 88 Q62 82 88 88 L86 108 Q64 119 48 106Z" fill="#27232d"/><path d="M137 88 Q118 82 92 88 L94 108 Q116 119 132 106Z" fill="#27232d"/><path d="M87 92 Q90 89 93 92" fill="none" stroke="#27232d" stroke-width="4"/><path d="M50 91 L41 86 M130 91 L139 86" stroke="#27232d" stroke-width="3" stroke-linecap="round"/><path d="M52 91 Q64 87 80 91" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none"/><path d="M100 91 Q116 87 128 91" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none"/></g>`,
+    heart_glasses: `<g fill="none" stroke="#ef4e91" stroke-width="3"><path d="M48 91 C48 79 65 76 69 88 C73 76 90 79 90 91 C90 104 69 116 69 116 C69 116 48 104 48 91Z"/><path d="M90 91 C90 79 107 76 111 88 C115 76 132 79 132 91 C132 104 111 116 111 116 C111 116 90 104 90 91Z"/><path d="M88 92 Q90 90 92 92"/></g>`,
+    star_glasses: `<g fill="#ffffff55" stroke="#7b44dc" stroke-width="3"><path d="M68 78 L74 91 L88 92 L77 101 L81 115 L68 107 L55 115 L59 101 L48 92 L62 91Z"/><path d="M112 78 L118 91 L132 92 L121 101 L125 115 L112 107 L99 115 L103 101 L92 92 L106 91Z"/><path d="M87 94 Q90 91 93 94" fill="none"/></g>`,
     hoops: `<g fill="none" stroke="#d2a52f" stroke-width="3.5"><circle cx="43" cy="126" r="12"/><circle cx="137" cy="126" r="12"/></g>`,
     pearl_earrings: `<g fill="#fffdf7" stroke="#c9c3bb"><circle cx="44" cy="124" r="6"/><circle cx="136" cy="124" r="6"/></g>`,
+    stud_earrings: `<g fill="#8c63df" stroke="#fff" stroke-width="1"><circle cx="44" cy="123" r="4"/><circle cx="136" cy="123" r="4"/></g>`,
+    heart_earrings: `<g fill="#e9508d"><path d="M38 124 C38 118 45 117 47 122 C49 117 56 118 56 124 C56 130 47 136 47 136 C47 136 38 130 38 124Z"/><path d="M124 124 C124 118 131 117 133 122 C135 117 142 118 142 124 C142 130 133 136 133 136 C133 136 124 130 124 124Z"/></g>`,
+    nose_ring: `<g fill="none" stroke="#d5b34d" stroke-width="2"><circle cx="95" cy="127" r="4.2"/><path d="M95 123 L98 124"/></g>`,
     choker: `<rect x="69" y="156" width="42" height="6" rx="3" fill="#201c25"/><circle cx="90" cy="161" r="2.6" fill="#d9b35e"/>`,
     necklace: `<path d="M65 158 Q90 185 115 158" fill="none" stroke="#d0aa45" stroke-width="2.4"/><circle cx="90" cy="181" r="4" fill="#d0aa45"/>`,
+    heart_necklace: `<path d="M65 158 Q90 184 115 158" fill="none" stroke="#d0aa45" stroke-width="2.2"/><path d="M85 178 C85 173 90 172 92 176 C94 172 99 173 99 178 C99 183 92 188 92 188 C92 188 85 183 85 178Z" fill="#e85d9f"/>`,
     hair_clip: `<g transform="rotate(18 132 59)"><rect x="120" y="55" width="24" height="7" rx="3.5" fill="#ef7cac"/><circle cx="126" cy="58.5" r="2" fill="#ffffff77"/></g>`,
     bow: `<g fill="#e75f9d"><path d="M124 45 Q104 32 111 58Z"/><path d="M137 45 Q157 32 150 58Z"/><circle cx="131" cy="47" r="7"/></g>`,
+    flower: `<g transform="translate(127 51)"><g fill="#f074a9"><circle cx="0" cy="-8" r="7"/><circle cx="8" cy="0" r="7"/><circle cx="0" cy="8" r="7"/><circle cx="-8" cy="0" r="7"/></g><circle cx="0" cy="0" r="5" fill="#ffd45f"/></g>`,
+    headband: `<path d="M45 56 Q90 25 135 56" fill="none" stroke="#9c66e4" stroke-width="8" stroke-linecap="round"/><path d="M48 56 Q90 31 132 56" fill="none" stroke="#d9c2ff" stroke-width="2" opacity=".8"/>`,
   };
-
   return accessories[type] || "";
+}
+
+function hat(type) {
+  const hats = {
+    none: "",
+    cap: `<g><path d="M48 43 Q58 18 91 18 Q122 18 137 43 L132 59 Q90 45 48 59Z" fill="#6f35d4"/><path d="M88 56 Q119 47 148 58 Q126 65 99 65Z" fill="#5723b4"/><circle cx="91" cy="20" r="3" fill="#d8c2ff"/></g>`,
+    bucket: `<g><path d="M47 43 Q57 16 90 16 Q123 16 133 43 L128 55 Q90 45 52 55Z" fill="#e7a4c5"/><path d="M37 52 Q90 38 143 52 L134 67 Q90 57 46 67Z" fill="#d783ad"/><path d="M55 35 Q90 26 125 35" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2"/></g>`,
+    beanie: `<g><path d="M48 45 Q51 6 90 4 Q129 6 132 45Z" fill="#7745c7"/><rect x="45" y="39" width="90" height="18" rx="8" fill="#9a6be0"/><path d="M58 42 H122" stroke="#d8c4ff" stroke-width="2" opacity=".55"/></g>`,
+    cowboy: `<g><path d="M54 42 Q60 10 90 10 Q120 10 126 42 L118 54 Q90 48 62 54Z" fill="#a8713f"/><path d="M24 51 Q56 44 74 48 Q90 52 106 48 Q125 44 156 51 Q142 67 112 65 Q90 61 68 65 Q38 67 24 51Z" fill="#8e5b31"/><path d="M60 40 Q90 48 120 40" stroke="#4c3022" stroke-width="4" fill="none"/></g>`,
+    witch: `<g><path d="M90 -8 L128 45 L58 45Z" fill="#32233f"/><path d="M28 45 Q90 35 152 45 Q137 61 90 59 Q43 61 28 45Z" fill="#25182f"/><path d="M69 31 L119 31" stroke="#8c55d8" stroke-width="7"/><circle cx="112" cy="31" r="5" fill="#f0c552"/></g>`,
+    crown: `<g fill="#f1c84b" stroke="#b88a18" stroke-width="2"><path d="M55 47 L60 18 L76 34 L90 12 L104 34 L121 18 L126 47Z"/><rect x="55" y="44" width="71" height="12" rx="4"/></g><g fill="#d95f9f"><circle cx="68" cy="45" r="3"/><circle cx="90" cy="44" r="3"/><circle cx="113" cy="45" r="3"/></g>`,
+    graduation: `<g><path d="M39 31 L90 8 L141 31 L90 54Z" fill="#24212a"/><path d="M58 40 V58 Q90 70 122 58 V40" fill="#302c38"/><circle cx="90" cy="31" r="4" fill="#d5aa35"/><path d="M92 32 Q133 39 135 69" fill="none" stroke="#d5aa35" stroke-width="2.5"/><circle cx="135" cy="72" r="4" fill="#d5aa35"/></g>`,
+  };
+  return hats[type] || "";
 }
 
 function avatar(profile = {}) {
@@ -862,6 +932,7 @@ function avatar(profile = {}) {
 
     ${details}
     ${frontHair(style, hair)}
+    ${hat(profile.avatar_hat || "none")}
     ${accessory(profile.avatar_accessory || "none")}
   </svg>`;
 }
@@ -1170,7 +1241,7 @@ function renderProfile() {
   } else {
     customization = `
       <div class="avatar-section">
-        <h4>Acessórios</h4>
+        <h4>🎀 Acessórios</h4>
         <div class="options">
           ${Object.entries(accessoryNames)
             .map(
@@ -1181,7 +1252,18 @@ function renderProfile() {
       </div>
 
       <div class="avatar-section">
-        <h4>Detalhes do rosto</h4>
+        <h4>🧢 Chapéus</h4>
+        <div class="options">
+          ${Object.entries(hatNames)
+            .map(
+              ([key, label]) => `<button class="option ${(me.avatar_hat || "none") === key ? "active" : ""}" onclick="upd('avatar_hat','${key}')">${esc(label)}</button>`,
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <div class="avatar-section">
+        <h4>✨ Detalhes do rosto</h4>
         <div class="options">
           <button class="option ${me.avatar_freckles ? "active" : ""}" onclick="upd('avatar_freckles',${!me.avatar_freckles})">Sardas</button>
           <button class="option ${me.avatar_beauty_mark ? "active" : ""}" onclick="upd('avatar_beauty_mark',${!me.avatar_beauty_mark})">Pintinha</button>
