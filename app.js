@@ -157,18 +157,27 @@ const accessoryNames = {
 };
 
 const shirtNames = {
+  // Cores básicas
   purple: "Roxa",
   pink: "Rosa",
   green: "Verde",
   blue: "Azul",
   black: "Preta",
   white: "Branca",
+
+  // Orgulho / bandeiras
   rainbow: "LGBT+",
   lesbian: "Lésbica",
   bi: "Bissexual",
   trans: "Trans",
   pan: "Pan",
   nb: "Não-binária",
+
+  // Times / instituições
+  cruzeiro: "Cruzeiro",
+  flamengo: "Flamengo",
+  brasil: "Brasil",
+  ufmg: "UFMG",
 };
 
 // ============================================================================
@@ -649,39 +658,118 @@ function frontHair(style, color) {
 }
 
 function shirtColor(type) {
-  return (
-    {
-      purple: "#7b44dc",
-      pink: "#ed72a5",
-      green: "#5aad67",
-      blue: "#4f7ccf",
-      black: "#25232a",
-      white: "#f4f4f4",
-    }[type] || "#ffffff"
-  );
+  const colors = {
+    // Cores básicas
+    purple: "#7b44dc",
+    pink: "#ed72a5",
+    green: "#5aad67",
+    blue: "#4f7ccf",
+    black: "#25232a",
+    white: "#f4f4f4",
+
+    // Camisetas especiais
+    cruzeiro: "#1f4fa3",
+    flamengo: "#d71920",
+    brasil: "#f7d117",
+    ufmg: "#ffffff",
+  };
+
+  return colors[type] || "#ffffff";
 }
 
 function shirtPattern(type) {
-  const patterns = {
+  // ------------------------------------------------------------------------
+  // Bandeiras LGBT+
+  // ------------------------------------------------------------------------
+  const flags = {
     rainbow: ["#e40303", "#ff8c00", "#ffed00", "#008026", "#004dff", "#750787"],
-    lesbian: ["#d52d00", "#ef7627", "#fff", "#d162a4", "#a30262"],
+    lesbian: ["#d52d00", "#ef7627", "#ffffff", "#d162a4", "#a30262"],
     bi: ["#d60270", "#d60270", "#9b4f96", "#0038a8", "#0038a8"],
-    trans: ["#5bcffb", "#f5abb9", "#fff", "#f5abb9", "#5bcffb"],
+    trans: ["#5bcffb", "#f5abb9", "#ffffff", "#f5abb9", "#5bcffb"],
     pan: ["#ff218c", "#ffd800", "#21b1ff"],
-    nb: ["#fff430", "#fff", "#9c59d1", "#000"],
+    nb: ["#fff430", "#ffffff", "#9c59d1", "#000000"],
   };
 
-  if (!patterns[type]) return "";
+  if (flags[type]) {
+    const colors = flags[type];
+    const height = 44 / colors.length;
 
-  const colors = patterns[type];
-  const height = 44 / colors.length;
+    return colors
+      .map(
+        (color, index) =>
+          `<rect x="50" y="166" width="80" height="${height + 1}" transform="translate(0 ${index * height})" fill="${color}"/>`,
+      )
+      .join("");
+  }
 
-  return colors
-    .map(
-      (color, index) =>
-        `<rect x="50" y="166" width="80" height="${height + 1}" transform="translate(0 ${index * height})" fill="${color}"/>`,
-    )
-    .join("");
+  // ------------------------------------------------------------------------
+  // Cruzeiro — camisa azul com estrelas brancas estilizadas
+  // ------------------------------------------------------------------------
+  if (type === "cruzeiro") {
+    return `
+      <g>
+        <path d="M52 174 Q62 166 72 164" fill="none" stroke="#ffffff" stroke-width="3" opacity=".9"/>
+        <path d="M108 164 Q118 166 128 174" fill="none" stroke="#ffffff" stroke-width="3" opacity=".9"/>
+
+        <g fill="#ffffff">
+          <circle cx="90" cy="182" r="2.8"/>
+          <circle cx="82" cy="188" r="2.3"/>
+          <circle cx="98" cy="188" r="2.3"/>
+          <circle cx="87" cy="196" r="2.1"/>
+          <circle cx="96" cy="197" r="2.1"/>
+        </g>
+      </g>
+    `;
+  }
+
+  // ------------------------------------------------------------------------
+  // Flamengo — camisa rubro-negra estilizada
+  // ------------------------------------------------------------------------
+  if (type === "flamengo") {
+    return `
+      <g>
+        <rect x="48" y="170" width="84" height="10" fill="#111111"/>
+        <rect x="48" y="190" width="84" height="10" fill="#111111"/>
+        <rect x="48" y="210" width="84" height="10" fill="#111111"/>
+
+        <circle cx="72" cy="181" r="6" fill="#ffffff" opacity=".9"/>
+        <text x="72" y="184" text-anchor="middle" font-size="7" font-weight="bold" fill="#d71920">CRF</text>
+      </g>
+    `;
+  }
+
+  // ------------------------------------------------------------------------
+  // Brasil — camisa amarela com detalhes verdes e azuis estilizados
+  // ------------------------------------------------------------------------
+  if (type === "brasil") {
+    return `
+      <g>
+        <path d="M76 165 Q90 176 104 165" fill="none" stroke="#148c3d" stroke-width="5" stroke-linecap="round"/>
+        <path d="M51 178 Q57 170 64 168" fill="none" stroke="#148c3d" stroke-width="4"/>
+        <path d="M116 168 Q123 170 129 178" fill="none" stroke="#148c3d" stroke-width="4"/>
+
+        <path d="M90 179 L101 185 L98 198 Q90 205 82 198 L79 185 Z" fill="#148c3d"/>
+        <circle cx="90" cy="191" r="6" fill="#2755a5"/>
+        <circle cx="90" cy="191" r="2" fill="#ffffff"/>
+      </g>
+    `;
+  }
+
+  // ------------------------------------------------------------------------
+  // UFMG — camisa branca com identidade visual textual simplificada
+  // ------------------------------------------------------------------------
+  if (type === "ufmg") {
+    return `
+      <g>
+        <path d="M60 169 Q90 182 120 169" fill="none" stroke="#1565a8" stroke-width="4"/>
+
+        <rect x="68" y="180" width="44" height="26" rx="4" fill="#ffffff" stroke="#1565a8" stroke-width="2"/>
+        <text x="90" y="197" text-anchor="middle" font-size="11" font-family="Arial, sans-serif" font-weight="bold" fill="#1565a8">UFMG</text>
+      </g>
+    `;
+  }
+
+  return "";
 }
 
 function accessory(type) {
