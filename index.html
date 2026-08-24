@@ -61,8 +61,12 @@
 
   <section id="app" class="app hidden">
     <header class="app-header">
-      <div><h1>Banheiro Apto 101 ✦</h1><small id="who"></small></div>
-      <button class="logout" onclick="logout()">Sair</button>
+      <button class="header-icon" onclick="showTab('dash')" aria-label="Abrir painel">☰</button>
+      <div class="header-center">
+        <h1 id="pageTitle">Painel</h1>
+        <small id="who"></small>
+      </div>
+      <button class="header-icon" type="button" aria-label="Notificações">🔔</button>
     </header>
 
     <main class="main">
@@ -98,5 +102,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
 </body>
 </html>

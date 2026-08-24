@@ -6,6 +6,7 @@ const rooms=["Quarto 5","Quarto 6","Quarto 7","Quarto 8","Quarto 9"];
 const schedule=[["2026-08-01","Quarto 9"],["2026-08-08","Quarto 5"],["2026-08-15","Quarto 6"],["2026-08-22","Quarto 7"],["2026-08-29","Quarto 8"],["2026-09-05","Quarto 9"],["2026-09-12","Quarto 5"],["2026-09-19","Quarto 6"],["2026-09-26","Quarto 7"],["2026-10-03","Quarto 8"],["2026-10-10","Quarto 9"],["2026-10-17","Quarto 5"],["2026-10-24","Quarto 6"],["2026-10-31","Quarto 7"],["2026-11-07","Quarto 8"],["2026-11-14","Quarto 9"],["2026-11-21","Quarto 5"],["2026-11-28","Quarto 6"],["2026-12-05","Quarto 7"],["2026-12-12","Quarto 8"],["2026-12-19","Quarto 9"],["2026-12-26","Quarto 5"]].map(([date,room])=>({date,room}));
 let me=null,profiles=[],cleaning=[],trash=[],calMonth=new Date().getMonth(),calYear=new Date().getFullYear(),pendingTrash=null;
 let avatarSeq=0;
+let profileView="appearance";
 
 const skinColors={porcelain:"#f9ddcf",light:"#f6d0b1",medium_light:"#dfa67f",medium:"#bd7f58",medium_dark:"#8c593d",dark:"#5d3928",deep:"#39241c"};
 const hairColors={jet_black:"#111016",soft_black:"#272129",dark_brown:"#3a241b",chocolate:"#5a3628",brown:"#744c37",auburn:"#8b3f2e",copper:"#b65b38",blonde:"#caaa68",platinum:"#e5dcc8",pink:"#c85d8d",purple:"#70439a",blue:"#435f95"};
@@ -28,7 +29,14 @@ async function logout(){await sb.auth.signOut();location.reload();}
 
 async function loadApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;let {data:p}=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();if(!p){const {error}=await sb.from("profiles").insert({id:user.id,name:user.user_metadata?.name||user.email.split("@")[0],room:user.user_metadata?.room||"Quarto 5"});if(error)return alert(error.message);({data:p}=await sb.from("profiles").select("*").eq("id",user.id).single());}me=p;$("landing").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("who").textContent=`${me.name} • ${me.room}`;await refresh();if(new URLSearchParams(location.search).get("quick")==="trash")setTimeout(openQuickTrash,250);}
 async function refresh(){const [p,c,t]=await Promise.all([sb.from("profiles").select("*"),sb.from("cleaning_records").select("*").order("cleaning_date"),sb.from("trash_records").select("*").order("trash_date",{ascending:false})]);profiles=p.data||[];cleaning=c.data||[];trash=t.data||[];me=profiles.find(x=>x.id===me.id)||me;renderAll();}
-function showTab(tab){["dash","agenda","trash","rank","profile","history"].forEach(id=>$(id).classList.toggle("hidden",id!==tab));const map={dash:"navDash",agenda:"navAgenda",trash:"navTrash",rank:"navRank",profile:"navProfile"};Object.values(map).forEach(id=>$(id)?.classList.remove("active"));if(map[tab])$(map[tab]).classList.add("active");}
+function showTab(tab){
+  ["dash","agenda","trash","rank","profile","history"].forEach(id=>$(id).classList.toggle("hidden",id!==tab));
+  const map={dash:"navDash",agenda:"navAgenda",trash:"navTrash",rank:"navRank",profile:"navProfile"};
+  Object.values(map).forEach(id=>$(id)?.classList.remove("active"));
+  if(map[tab])$(map[tab]).classList.add("active");
+  const titles={dash:"Painel",agenda:"Limpeza",trash:"Registro de lixo",rank:"Ranking",profile:"Meu perfil",history:"Histórico"};
+  if($("pageTitle")) $("pageTitle").textContent=titles[tab]||"Banheiro Apto 101";
+}
 const pname=id=>profiles.find(p=>p.id===id)?.name||"Morador";
 const proom=id=>profiles.find(p=>p.id===id)?.room||"";
 const crec=d=>cleaning.find(x=>x.cleaning_date===d);
@@ -63,15 +71,24 @@ function curlHighlights(color){
   </g>`;
 }
 
+function curlsMediumBase(c,dark){
+  return `<g>
+    <path d="M27 132 Q13 67 39 33 Q57 8 91 9 Q129 9 149 38 Q169 72 151 142 Q136 165 119 149 Q103 170 87 150 Q70 171 55 149 Q37 166 27 132Z" fill="${dark}"/>
+    <g fill="${c}"><circle cx="36" cy="62" r="27"/><circle cx="52" cy="34" r="29"/><circle cx="83" cy="26" r="31"/><circle cx="116" cy="30" r="30"/><circle cx="142" cy="54" r="27"/><circle cx="35" cy="96" r="28"/><circle cx="145" cy="94" r="29"/><circle cx="47" cy="129" r="28"/><circle cx="132" cy="130" r="29"/><circle cx="76" cy="145" r="27"/><circle cx="105" cy="145" r="27"/></g>
+    ${curlHighlights(c)}
+  </g>`;
+}
+
 function backHair(s,c,c2){
   const cB=c2||c, dark=mixHex(c,"#000000",.24), hi=mixHex(c,"#ffffff",.18);
+  const medium=curlsMediumBase(c,dark);
   const m={
     curls_short:`<g><ellipse cx="90" cy="65" rx="62" ry="55" fill="${dark}"/><g fill="${c}"><circle cx="43" cy="58" r="24"/><circle cx="61" cy="35" r="27"/><circle cx="90" cy="28" r="30"/><circle cx="120" cy="36" r="27"/><circle cx="138" cy="60" r="23"/><circle cx="49" cy="86" r="23"/><circle cx="131" cy="87" r="23"/></g>${curlHighlights(c)}</g>`,
-    curls_medium:`<g><path d="M27 132 Q13 67 39 33 Q57 8 91 9 Q129 9 149 38 Q169 72 151 142 Q136 165 119 149 Q103 170 87 150 Q70 171 55 149 Q37 166 27 132Z" fill="${dark}"/><g fill="${c}"><circle cx="36" cy="62" r="27"/><circle cx="52" cy="34" r="29"/><circle cx="83" cy="26" r="31"/><circle cx="116" cy="30" r="30"/><circle cx="142" cy="54" r="27"/><circle cx="35" cy="96" r="28"/><circle cx="145" cy="94" r="29"/><circle cx="47" cy="129" r="28"/><circle cx="132" cy="130" r="29"/><circle cx="76" cy="145" r="27"/><circle cx="105" cy="145" r="27"/></g>${curlHighlights(c)}</g>`,
+    curls_medium:medium,
     curls_long:`<g><path d="M22 183 Q13 79 35 38 Q53 6 90 7 Q129 7 149 39 Q171 79 158 188 Q137 204 120 185 Q104 207 88 187 Q69 208 54 185 Q35 205 22 183Z" fill="${dark}"/><g fill="${c}"><circle cx="36" cy="58" r="28"/><circle cx="55" cy="29" r="29"/><circle cx="88" cy="22" r="32"/><circle cx="121" cy="30" r="30"/><circle cx="145" cy="58" r="28"/><circle cx="30" cy="96" r="29"/><circle cx="151" cy="96" r="29"/><circle cx="31" cy="137" r="29"/><circle cx="149" cy="139" r="29"/><circle cx="45" cy="176" r="28"/><circle cx="134" cy="177" r="28"/></g>${curlHighlights(c)}</g>`,
-    curls_bangs:`<g>${backHair('curls_medium',c,cB)}<g fill="${c}"><circle cx="64" cy="48" r="18"/><circle cx="86" cy="43" r="19"/><circle cx="108" cy="49" r="18"/></g></g>`,
+    curls_bangs:`<g>${medium}<g fill="${c}"><circle cx="56" cy="49" r="18"/><circle cx="73" cy="43" r="19"/><circle cx="91" cy="42" r="19"/><circle cx="109" cy="45" r="18"/><circle cx="124" cy="53" r="16"/></g></g>`,
     curls_volume:`<g><ellipse cx="90" cy="94" rx="84" ry="91" fill="${dark}"/><g fill="${c}"><circle cx="20" cy="73" r="33"/><circle cx="35" cy="38" r="34"/><circle cx="65" cy="20" r="35"/><circle cx="99" cy="18" r="36"/><circle cx="133" cy="33" r="35"/><circle cx="157" cy="66" r="34"/><circle cx="16" cy="111" r="34"/><circle cx="164" cy="109" r="35"/><circle cx="30" cy="150" r="35"/><circle cx="150" cy="150" r="35"/><circle cx="59" cy="180" r="34"/><circle cx="120" cy="179" r="34"/></g>${curlHighlights(c)}</g>`,
-    curls_side:`<g>${backHair('curls_medium',c,cB)}<g fill="${c}"><circle cx="145" cy="123" r="33"/><circle cx="148" cy="157" r="31"/></g></g>`,
+    curls_side:`<g>${medium}<g fill="${c}"><circle cx="145" cy="123" r="33"/><circle cx="148" cy="157" r="31"/></g></g>`,
     afro:`<g><circle cx="90" cy="84" r="76" fill="${dark}"/><g fill="${c}"><circle cx="31" cy="48" r="34"/><circle cx="57" cy="22" r="34"/><circle cx="91" cy="18" r="37"/><circle cx="126" cy="25" r="34"/><circle cx="151" cy="53" r="33"/><circle cx="21" cy="86" r="34"/><circle cx="160" cy="89" r="34"/><circle cx="35" cy="125" r="34"/><circle cx="145" cy="127" r="34"/><circle cx="68" cy="145" r="35"/><circle cx="112" cy="145" r="35"/></g>${curlHighlights(c)}</g>`,
     afro_big:`<g><circle cx="90" cy="92" r="89" fill="${dark}"/><g fill="${c}"><circle cx="17" cy="54" r="39"/><circle cx="47" cy="20" r="39"/><circle cx="88" cy="10" r="42"/><circle cx="132" cy="22" r="40"/><circle cx="165" cy="57" r="39"/><circle cx="7" cy="101" r="40"/><circle cx="173" cy="102" r="40"/><circle cx="24" cy="148" r="40"/><circle cx="157" cy="149" r="40"/><circle cx="63" cy="181" r="39"/><circle cx="120" cy="181" r="39"/></g>${curlHighlights(c)}</g>`,
     straight_middle:`<g><path d="M35 194 Q24 22 89 11 Q155 22 145 194 L120 208 L101 89 L90 42 L79 89 L59 208Z" fill="${dark}"/><path d="M42 190 Q33 28 89 18 Q146 28 138 190 L119 198 L99 83 L90 39 L81 83 L61 198Z" fill="${c}"/><path d="M55 55 Q69 27 88 33 M125 56 Q110 27 92 33" fill="none" stroke="${hi}" stroke-width="4" opacity=".38"/></g>`,
@@ -186,23 +203,39 @@ function renderAgenda(){$("agenda").innerHTML=`<h2>🧹 Rodízio de limpeza</h2>
 function renderTrash(){const first=new Date(calYear,calMonth,1),last=new Date(calYear,calMonth+1,0),start=(first.getDay()+6)%7,d0=today();let days="";for(let i=0;i<start;i++)days+=`<div class="cal-day empty"></div>`;for(let d=1;d<=last.getDate();d++){const ds=`${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`,rs=trash.filter(x=>x.trash_date===ds);days+=`<div class="cal-day ${rs.length?"registered":""} ${ds===d0?"today":""}"><span class="num">${d}</span>${rs.map(x=>`<span class="mark">● ${esc(pname(x.recorded_by))}</span>`).join("")}<button onclick="addTrash('${ds}')">+ registrar</button></div>`}$("trash").innerHTML=`<h2>🗑️ Registro do lixo</h2><div class="card calendar-card"><div class="cal-toolbar"><button onclick="changeMonth(-1)">‹</button><b>${first.toLocaleString("pt-BR",{month:"long",year:"numeric"})}</b><button onclick="changeMonth(1)">›</button></div><div class="cal-week"><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span></div><div class="cal-grid">${days}</div><div class="legend"><span><i class="dot" style="background:#20b65d"></i>Lixo registrado</span><span><i class="dot" style="background:#7137d8"></i>Hoje</span></div></div><button class="btn green wide" onclick="openQuickTrash()">＋ Registrar lixo hoje</button><div class="card"><h3>Registros recentes</h3>${trash.slice(0,30).map(x=>`<div class="recent row"><span>${br(x.trash_date)} — <b>${esc(pname(x.recorded_by))}</b> ${proom(x.recorded_by)?`(${esc(proom(x.recorded_by))})`:""}</span>${x.recorded_by===me.id?`<button class="small-btn" onclick="delTrash(${x.id})">✕</button>`:""}</div>`).join("")||"<small>Nenhum registro ainda.</small>"}</div>`;}
 function changeMonth(n){calMonth+=n;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderTrash();}
 function renderRank(){$("rank").innerHTML=`<h2>🏆 Ranking completo</h2><div class="card"><table><thead><tr><th>#</th><th>Pessoa</th><th>Quarto</th><th>Lixo</th></tr></thead><tbody>${ranking().map(([id,c],i)=>`<tr><td>${i+1}</td><td><b>${esc(pname(id))}</b></td><td>${esc(proom(id))}</td><td>${c}</td></tr>`).join("")}</tbody></table></div>`;}
+function setProfileView(view){profileView=view;renderProfile();}
 async function upd(f,v){const {error}=await sb.from("profiles").update({[f]:v}).eq("id",me.id);if(error)return alert(error.message);me[f]=v;renderProfile();renderDashboard();}
 async function saveProfile(){const name=$("profileName").value.trim(),room=$("profileRoom").value,{error}=await sb.from("profiles").update({name,room}).eq("id",me.id);if(error)return alert(error.message);await refresh();$("who").textContent=`${me.name} • ${me.room}`;}
 function hairPreview(style){return avatar({...me,avatar_hair:style});}
-function renderProfile(){const m=myRank(),future=myFuture(),braid=["braids","box_braids"].includes(me.avatar_hair||"");$("profile").innerHTML=`<h2>👤 Meu perfil</h2><div class="card profile-top"><div class="avatar-card"><div class="avatar-big">${avatar(me)}</div><b>${esc(me.name)}</b><div><small>${esc(me.room)}</small></div></div><div><div class="editor"><div class="field"><label>Nome</label><input id="profileName" value="${esc(me.name)}"></div><div class="field"><label>Quarto</label><select id="profileRoom">${rooms.map(r=>`<option ${r===me.room?"selected":""}>${r}</option>`).join("")}</select></div></div><button class="btn primary" onclick="saveProfile()">Salvar</button></div></div>
-<div class="card"><h3>🎨 Personalizar caricatura</h3>
-<div class="avatar-section"><h4>Tom de pele</h4><div class="colors">${Object.entries(skinColors).map(([k,c])=>`<button class="color ${me.avatar_skin===k?"active":""}" style="background:${c}" onclick="upd('avatar_skin','${k}')"></button>`).join("")}</div></div>
-<div class="avatar-section"><h4>Cabelo</h4><div class="hair-grid">${Object.entries(hairNames).map(([k,l])=>`<button class="hair-choice ${me.avatar_hair===k?"active":""}" onclick="upd('avatar_hair','${k}')"><div class="mini-avatar">${hairPreview(k)}</div>${l}</button>`).join("")}</div></div>
-<div class="avatar-section"><h4>Cor principal do cabelo</h4><div class="colors">${Object.entries(hairColors).map(([k,c])=>`<button class="color ${me.avatar_hair_color===k?"active":""}" style="background:${c}" onclick="upd('avatar_hair_color','${k}')"></button>`).join("")}</div></div>
-${braid?`<div class="avatar-section"><h4>Segunda cor das tranças</h4><div class="colors">${Object.entries(hairColors).map(([k,c])=>`<button class="color ${me.avatar_hair_color_2===k?"active":""}" style="background:${c}" onclick="upd('avatar_hair_color_2','${k}')"></button>`).join("")}</div></div>`:""}
-<div class="avatar-section"><h4>Cor dos olhos</h4><div class="colors">${Object.entries(eyeColors).map(([k,c])=>`<button class="color ${me.avatar_eyes===k?"active":""}" style="background:${c}" onclick="upd('avatar_eyes','${k}')"></button>`).join("")}</div></div>
-<div class="avatar-section"><h4>Blusa</h4><div class="options">${Object.entries(shirtNames).map(([k,l])=>`<button class="option ${me.avatar_shirt===k?"active":""}" onclick="upd('avatar_shirt','${k}')">${l}</button>`).join("")}</div></div>
-<div class="avatar-section"><h4>Acessórios</h4><div class="options">${Object.entries(accessoryNames).map(([k,l])=>`<button class="option ${(me.avatar_accessory||"none")===k?"active":""}" onclick="upd('avatar_accessory','${k}')">${l}</button>`).join("")}</div></div>
-<div class="avatar-section"><h4>Detalhes</h4><div class="options"><button class="option ${me.avatar_freckles?"active":""}" onclick="upd('avatar_freckles',${!me.avatar_freckles})">Sardas</button><button class="option ${me.avatar_beauty_mark?"active":""}" onclick="upd('avatar_beauty_mark',${!me.avatar_beauty_mark})">Pintinha</button></div></div></div>
-<div class="stats"><div class="stat"><b>${m.count}</b><small>vezes que tirou lixo</small></div><div class="stat"><b>${m.rank}</b><small>posição no ranking</small></div></div>
-<div class="card"><h3>🧹 Próximos dias</h3>${future.map(x=>`<div class="recent"><b>${br(x.date)}</b> • ${x.room}</div>`).join("")||"<small>Nenhuma data futura.</small>"}<div class="actions"><button class="btn primary" onclick="downloadICS()">📥 Baixar calendário</button><button class="btn light" onclick="googleNext()">📅 Google Agenda</button></div></div>`;}
+function renderProfile(){
+  const m=myRank(), future=myFuture(), braid=["braids","box_braids"].includes(me.avatar_hair||"");
+  let customization="";
+  if(profileView==="appearance"){
+    customization=`
+      <div class="avatar-section"><h4>Tom de pele</h4><div class="colors">${Object.entries(skinColors).map(([k,c])=>`<button class="color ${me.avatar_skin===k?"active":""}" style="background:${c}" onclick="upd('avatar_skin','${k}')" aria-label="Tom ${k}"></button>`).join("")}</div></div>
+      <div class="avatar-section"><h4>Cabelo</h4><div class="hair-grid">${Object.entries(hairNames).map(([k,l])=>`<button class="hair-choice ${me.avatar_hair===k?"active":""}" onclick="upd('avatar_hair','${k}')" title="${l}"><div class="mini-avatar">${hairPreview(k)}</div><span>${l}</span></button>`).join("")}</div></div>
+      <div class="avatar-section"><h4>Cor do cabelo</h4><div class="colors">${Object.entries(hairColors).map(([k,c])=>`<button class="color ${me.avatar_hair_color===k?"active":""}" style="background:${c}" onclick="upd('avatar_hair_color','${k}')" aria-label="Cor ${k}"></button>`).join("")}</div></div>
+      ${braid?`<div class="avatar-section"><h4>Segunda cor das tranças</h4><div class="colors">${Object.entries(hairColors).map(([k,c])=>`<button class="color ${me.avatar_hair_color_2===k?"active":""}" style="background:${c}" onclick="upd('avatar_hair_color_2','${k}')" aria-label="Segunda cor ${k}"></button>`).join("")}</div></div>`:""}
+      <div class="avatar-section"><h4>Cor dos olhos</h4><div class="colors eye-colors">${Object.entries(eyeColors).map(([k,c])=>`<button class="color eye-dot ${me.avatar_eyes===k?"active":""}" style="--eye:${c}" onclick="upd('avatar_eyes','${k}')" aria-label="Olhos ${k}"></button>`).join("")}</div></div>`;
+  }else if(profileView==="clothes"){
+    customization=`<div class="avatar-section"><h4>Escolha a blusa</h4><div class="options">${Object.entries(shirtNames).map(([k,l])=>`<button class="option ${me.avatar_shirt===k?"active":""}" onclick="upd('avatar_shirt','${k}')">${l}</button>`).join("")}</div></div>`;
+  }else{
+    customization=`<div class="avatar-section"><h4>Acessórios</h4><div class="options">${Object.entries(accessoryNames).map(([k,l])=>`<button class="option ${(me.avatar_accessory||"none")===k?"active":""}" onclick="upd('avatar_accessory','${k}')">${l}</button>`).join("")}</div></div><div class="avatar-section"><h4>Detalhes do rosto</h4><div class="options"><button class="option ${me.avatar_freckles?"active":""}" onclick="upd('avatar_freckles',${!me.avatar_freckles})">Sardas</button><button class="option ${me.avatar_beauty_mark?"active":""}" onclick="upd('avatar_beauty_mark',${!me.avatar_beauty_mark})">Pintinha</button></div></div>`;
+  }
+  $("profile").innerHTML=`
+    <div class="profile-hero"><div class="avatar-big">${avatar(me)}</div><div class="profile-name">${esc(me.name)}</div><small>${esc(me.room)}</small></div>
+    <div class="profile-tabs"><button class="${profileView==="appearance"?"active":""}" onclick="setProfileView('appearance')">Aparência</button><button class="${profileView==="clothes"?"active":""}" onclick="setProfileView('clothes')">Roupas</button><button class="${profileView==="accessories"?"active":""}" onclick="setProfileView('accessories')">Acessórios</button></div>
+    ${customization}
+    <div class="card profile-edit-data"><h3>Dados do perfil</h3><div class="editor"><div class="field"><label>Nome</label><input id="profileName" value="${esc(me.name)}"></div><div class="field"><label>Quarto</label><select id="profileRoom">${rooms.map(r=>`<option ${r===me.room?"selected":""}>${r}</option>`).join("")}</select></div></div><button class="btn primary wide" onclick="saveProfile()">Salvar perfil</button><button class="btn light wide" onclick="logout()">Sair da conta</button></div>
+    <div class="stats two-stats"><div class="stat"><b>${m.count}</b><small>vezes que tirou lixo</small></div><div class="stat"><b>${m.rank}</b><small>posição no ranking</small></div></div>
+    <div class="card"><h3>🧹 Próximas limpezas</h3>${future.map(x=>`<div class="recent"><b>${br(x.date)}</b> • ${x.room}</div>`).join("")||"<small>Nenhuma data futura.</small>"}<div class="actions"><button class="btn primary" onclick="downloadICS()">📥 Baixar calendário</button><button class="btn light" onclick="googleNext()">📅 Google Agenda</button></div></div>`;
+}
+
 function renderHistory(){const items=[];cleaning.forEach(x=>items.push({a:x.recorded_at,h:`🧹 ${br(x.cleaning_date)} — <b>${x.assigned_room}</b> — ${x.status==="done"?"feito":"atrasado"} — ${esc(pname(x.recorded_by))}`}));trash.forEach(x=>items.push({a:x.recorded_at,h:`🗑️ ${br(x.trash_date)} — <b>${esc(pname(x.recorded_by))}</b> tirou o lixo`}));items.sort((a,b)=>new Date(b.a)-new Date(a.a));$("history").innerHTML=`<h2>📜 Histórico</h2>${items.slice(0,100).map(x=>`<div class="card">${x.h}</div>`).join("")}`;}
-function renderAll(){renderDashboard();renderAgenda();renderTrash();renderRank();renderProfile();renderHistory();}
+function renderAll(){
+  const renders=[["dash",renderDashboard],["agenda",renderAgenda],["trash",renderTrash],["rank",renderRank],["profile",renderProfile],["history",renderHistory]];
+  renders.forEach(([id,fn])=>{try{fn()}catch(e){console.error(`Erro em ${id}:`,e);const el=$(id);if(el)el.innerHTML=`<div class="card error-card"><b>Não foi possível carregar esta tela.</b><small>${esc(e.message||e)}</small></div>`;}});
+}
 function openQuickTrash(){pendingTrash=today();$("quickTrashText").innerHTML=`Registrar que <b>${esc(me?.name||"você")}</b> tirou o lixo hoje, <b>${br(pendingTrash)}</b>?`;$("quickTrashModal").classList.remove("hidden");}
 function closeQuickTrash(){$("quickTrashModal").classList.add("hidden");pendingTrash=null;}
 async function confirmQuickTrash(){const d=pendingTrash;closeQuickTrash();if(d)await addTrash(d);}
