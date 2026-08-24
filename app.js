@@ -86,26 +86,13 @@ let profileView = "appearance";
 // ============================================================================
 
 const skinColors = {
-  // Tons claros
   porcelain: "#f9ddcf",
   light: "#f6d0b1",
   medium_light: "#dfa67f",
-
-  // Tons médios
   medium: "#bd7f58",
-  caramel: "#a96f4f",
-  bronze: "#996044",
   medium_dark: "#8c593d",
-
-  // Tons negros
-  brown_dark: "#7a4a34",
-  cocoa: "#6a402f",
   dark: "#5d3928",
-  espresso: "#4c2f22",
-  ebony: "#42291f",
   deep: "#39241c",
-  deep_dark: "#2d1b16",
-  very_deep: "#241511"
 };
 
 const hairColors = {
@@ -211,7 +198,8 @@ const shirtNames = {
   flamengo: "Flamengo",
   brasil: "Brasil",
   ufmg: "UFMG",
-  dani: "Dani",
+  dani: "Dani-se",
+  thai_gl: "I Love Thai GL",
 };
 
 // ============================================================================
@@ -810,13 +798,65 @@ function shirtPattern(type) {
   if (type === "dani") {
     return `
       <g>
-        <path d="M62 170 Q90 181 118 170" fill="none" stroke="#d84f96" stroke-width="3.2"/>
-        <text x="90" y="196" text-anchor="middle" font-size="18" font-family="Arial, sans-serif" font-weight="900" font-style="italic" fill="#8d2d68">Dani</text>
-        <path d="M90 204 C86 198 77 201 77 208 C77 214 84 218 90 220 C96 218 103 214 103 208 C103 201 94 198 90 204Z" fill="#e85d9f" opacity=".9"/>
+        <!-- Fundo LGBT+ -->
+        <rect x="48" y="166" width="84" height="9" fill="#e40303"/>
+        <rect x="48" y="175" width="84" height="9" fill="#ff8c00"/>
+        <rect x="48" y="184" width="84" height="9" fill="#ffed00"/>
+        <rect x="48" y="193" width="84" height="9" fill="#008026"/>
+        <rect x="48" y="202" width="84" height="9" fill="#004dff"/>
+        <rect x="48" y="211" width="84" height="9" fill="#750787"/>
+
+        <!-- Destaque do texto -->
+        <rect x="58" y="181" width="64" height="28" rx="9"
+              fill="#ffffff" opacity=".88"/>
+
+        <text x="90" y="199"
+              text-anchor="middle"
+              font-size="13"
+              font-family="Arial, sans-serif"
+              font-weight="900"
+              fill="#452060">
+          Dani-se
+        </text>
       </g>
     `;
   }
 
+  if (type === "thai_gl") {
+    return `
+      <g>
+        <!-- Fundo da bandeira lésbica -->
+        <rect x="48" y="166" width="84" height="9" fill="#d52d00"/>
+        <rect x="48" y="175" width="84" height="9" fill="#ef7627"/>
+        <rect x="48" y="184" width="84" height="9" fill="#ff9a56"/>
+        <rect x="48" y="193" width="84" height="9" fill="#ffffff"/>
+        <rect x="48" y="202" width="84" height="9" fill="#d162a4"/>
+        <rect x="48" y="211" width="84" height="9" fill="#a30262"/>
+
+        <!-- Destaque do texto -->
+        <rect x="53" y="179" width="74" height="33" rx="8"
+              fill="#ffffff" opacity=".90"/>
+
+        <text x="90" y="191"
+              text-anchor="middle"
+              font-size="8.5"
+              font-family="Arial, sans-serif"
+              font-weight="900"
+              fill="#a30262">
+          I ♥
+        </text>
+
+        <text x="90" y="203"
+              text-anchor="middle"
+              font-size="9"
+              font-family="Arial, sans-serif"
+              font-weight="900"
+              fill="#a30262">
+          THAI GL
+        </text>
+      </g>
+    `;
+  }
   return "";
 }
 
