@@ -1,18 +1,41 @@
 {
   "name": "Banheiro Apto 101",
   "short_name": "Banheiro 101",
+  "description": "Organização e limpeza do Banheiro Apto 101.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f7f6fb",
+  "orientation": "portrait-primary",
+  "background_color": "#7137d8",
   "theme_color": "#7137d8",
   "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Registrar lixo",
       "short_name": "Lixo agora",
       "description": "Registrar rapidamente que você tirou o lixo",
-      "url": "./?quick=trash"
+      "url": "./?quick=trash",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
